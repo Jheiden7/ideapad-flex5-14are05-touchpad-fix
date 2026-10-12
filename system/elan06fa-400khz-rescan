@@ -1,0 +1,39 @@
+#!/bin/sh
+# Load elan06fa_400khz and, if the touchpad was not detected at boot (at
+# 100 kHz), rebind its I2C controller so the touchpad probes again at 400 kHz.
+CLIENT=/sys/bus/i2c/devices/i2c-ELAN06FA:00
+HID_DRIVER=/sys/bus/i2c/drivers/i2c_hid_acpi
+
+detected() { [ -e "$HID_DRIVER/i2c-ELAN06FA:00" ]; }
+
+if ! modprobe elan06fa_400khz; then
+    echo "Could not load elan06fa_400khz for kernel $(uname -r)."
+    exit 0
+fi
+
+if detected; then
+    echo "Touchpad detected at boot; nothing to do."
+    exit 0
+fi
+
+# .../<controller>/i2c-N/i2c-ELAN06FA:00 -> <controller>
+ctrl_path=$(dirname "$(dirname "$(readlink -f "$CLIENT")")")
+ctrl=$(basename "$ctrl_path")
+driver=$(readlink -f "$ctrl_path/driver")
+if [ ! -e "$CLIENT" ] || [ ! -d "$driver" ]; then
+    echo "Touchpad I2C controller not found."
+    exit 1
+fi
+
+for try in 1 2 3; do
+    echo "$ctrl" > "$driver/unbind"
+    sleep 0.5
+    echo "$ctrl" > "$driver/bind"
+    sleep 2
+    if detected; then
+        echo "Touchpad recovered at 400 kHz (attempt $try)."
+        exit 0
+    fi
+done
+echo "Could not recover the touchpad."
+exit 1

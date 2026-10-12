@@ -1,0 +1,13 @@
+[Unit]
+Description=Run the ELAN06FA touchpad I2C bus at 400 kHz (recovers the touchpad after a warm reboot)
+ConditionPathExists=/sys/bus/i2c/devices/i2c-ELAN06FA:00
+After=systemd-modules-load.service
+Before=display-manager.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/elan06fa-400khz-rescan
+
+[Install]
+WantedBy=multi-user.target
