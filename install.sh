@@ -9,31 +9,65 @@ set -euo pipefail
 NAME=elan06fa-400khz
 SRC=$(cd "$(dirname "$0")" && pwd)
 VER=$(sed -n 's/^PACKAGE_VERSION="\(.*\)"/\1/p' "$SRC/module/dkms.conf")
-MOK_DER=/var/lib/shim-signed/mok/MOK.der
 
 [[ $EUID -eq 0 ]] || { echo "Run as root: sudo $0 ${1:-install}"; exit 1; }
 
-# Removes every DKMS version of the module (also older releases).
+# DKMS versions of the module on the system, one per line. `dkms status`
+# prints "name/ver, kernel, arch: state", or "name/ver: added" for a version
+# that is not built for any kernel.
+dkms_versions() {
+  dkms status -m "$NAME" 2>/dev/null | sed -n "s|^$NAME/\([^,:]*\)[,:].*|\1|p" | sort -u
+}
+
+# Removes every DKMS version of the module except $1, if given.
 remove_dkms() {
   local v
-  for v in $(dkms status -m "$NAME" 2>/dev/null | sed -n "s|^$NAME/\([^,]*\),.*|\1|p" | sort -u); do
+  for v in $(dkms_versions); do
+    [[ $v == "${1:-}" ]] && continue
     dkms remove -m "$NAME" -v "$v" --all >/dev/null 2>&1 || true
     rm -rf "/usr/src/$NAME-$v"
   done
 }
 
+build_failed() {
+  local log=/var/lib/dkms/$NAME/$VER/build/make.log
+  echo "  Build failed for kernel $1."
+  if [[ -f $log ]]; then
+    echo "  Last lines of $log:"
+    tail -n 15 "$log" | sed 's/^/    /'
+  fi
+}
+
+# Certificate DKMS signs modules with: from its configuration, otherwise the
+# usual locations (Ubuntu/Mint, then upstream DKMS).
+dkms_mok_cert() {
+  local c
+  c=$(grep -hE '^[[:space:]]*mok_certificate=' /etc/dkms/framework.conf \
+        /etc/dkms/framework.conf.d/*.conf 2>/dev/null | tail -n 1 | cut -d= -f2- | tr -d "\"'")
+  if [[ -z $c ]]; then
+    for c in /var/lib/shim-signed/mok/MOK.der /var/lib/dkms/mok.pub; do
+      [[ -f $c ]] && break
+    done
+  fi
+  [[ -f $c ]] && echo "$c"
+}
+
 check_secure_boot() {
   command -v mokutil >/dev/null || return 0
   mokutil --sb-state 2>/dev/null | grep -q "SecureBoot enabled" || return 0
-  if [[ -f $MOK_DER ]] && mokutil --test-key "$MOK_DER" 2>/dev/null | grep -q "already enrolled"; then
-    echo "Secure Boot is enabled and the DKMS signing key (MOK) is enrolled."
+  local cert
+  cert=$(dkms_mok_cert || true)
+  if [[ -z $cert ]]; then
+    echo "Secure Boot is enabled: make sure the key DKMS signs modules with is enrolled."
+  elif mokutil --test-key "$cert" 2>/dev/null | grep -q "already enrolled"; then
+    echo "Secure Boot is enabled and the DKMS signing key ($cert) is enrolled."
   else
     cat <<EOF
 
-WARNING: Secure Boot is enabled but the DKMS signing key is not enrolled, so
-the module will be refused at load time. Enroll it once:
+WARNING: Secure Boot is enabled but the DKMS signing key ($cert) is not
+enrolled, so the module will be refused at load time. Enroll it once:
 
-    sudo mokutil --import $MOK_DER
+    sudo mokutil --import $cert
     (choose a one-time password, reboot, then in the blue "MOK management"
      screen pick: Enroll MOK -> Continue -> Yes -> password -> Reboot)
 
@@ -44,20 +78,33 @@ EOF
 case "${1:-install}" in
   install)
     command -v dkms >/dev/null || { echo "DKMS is missing: sudo apt install dkms"; exit 1; }
-    if [[ ! -d /lib/modules/$(uname -r)/build ]]; then
-      echo "Headers for the running kernel are missing: sudo apt install linux-headers-$(uname -r)"
+    KVER=$(uname -r)
+    if [[ ! -d /lib/modules/$KVER/build ]]; then
+      echo "Headers for the running kernel are missing: sudo apt install linux-headers-$KVER"
       exit 1
     fi
 
-    remove_dkms
+    # Build the new version first; older versions stay installed until it builds.
+    dkms remove -m "$NAME" -v "$VER" --all >/dev/null 2>&1 || true
+    rm -rf "/usr/src/$NAME-$VER"
     mkdir -p "/usr/src/$NAME-$VER"
     cp "$SRC"/module/{elan06fa_400khz.c,Makefile,dkms.conf} "/usr/src/$NAME-$VER/"
     dkms add -m "$NAME" -v "$VER" >/dev/null
+    echo "Building for the running kernel $KVER..."
+    if ! dkms build -m "$NAME" -v "$VER" -k "$KVER" >/dev/null 2>&1; then
+      build_failed "$KVER"
+      dkms remove -m "$NAME" -v "$VER" --all >/dev/null 2>&1 || true
+      rm -rf "/usr/src/$NAME-$VER"
+      echo "Nothing was changed: a previously installed version, if any, is still in place."
+      exit 1
+    fi
+
+    remove_dkms "$VER"
     for k in /lib/modules/*; do
       k=$(basename "$k")
       [[ -d /lib/modules/$k/build ]] || continue
-      echo "Building for kernel $k..."
-      dkms install -m "$NAME" -v "$VER" -k "$k" >/dev/null || echo "  build failed for $k"
+      echo "Installing for kernel $k..."
+      dkms install -m "$NAME" -v "$VER" -k "$k" --force >/dev/null 2>&1 || build_failed "$k"
     done
 
     install -m 755 "$SRC/system/elan06fa-400khz-rescan" /usr/local/sbin/

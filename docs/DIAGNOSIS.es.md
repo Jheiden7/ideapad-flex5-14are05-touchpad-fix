@@ -109,8 +109,8 @@ modificado: basta con un módulo que cambie la velocidad de este único bus y co
 volver a conectar el controlador después del arranque. Ver "Cómo funciona" en el
 [README](../README.es.md).
 
-Con la solución en el 7.0.0-14 (Secure Boot activado, módulo firmado con la
-clave MOK):
+Con la solución (versión 1.0) en el 7.0.0-14 (Secure Boot activado, módulo
+firmado con la clave MOK):
 
 ```
 i2c_designware AMDI0010:03: [Firmware Bug]: DSDT uses known not-working I2C bus speed 400000, forcing it to 100000
@@ -120,9 +120,10 @@ elan06fa_400khz: AMDI0010:03: bus speed 100 kHz -> 400 kHz
 input: ELAN06FA:00 04F3:3140 Touchpad as /devices/platform/AMDI0010:03/i2c-4/i2c-ELAN06FA:00/...
 ```
 
-En 18 días de uso normal: 24 arranques, 21 en frío (el touchpad ya funcionaba y
-el servicio no hizo nada) y 3 reinicios en caliente, todos recuperados al primer
-intento.
+En 18 días de uso normal con la versión 1.0: 24 arranques, 21 en frío (el
+touchpad ya funcionaba y el servicio no hizo nada) y 3 reinicios en caliente,
+todos recuperados al primer intento. La versión 1.1 mantiene el mismo mecanismo;
+su verificación está pendiente.
 
 ## 7. Preguntas abiertas
 

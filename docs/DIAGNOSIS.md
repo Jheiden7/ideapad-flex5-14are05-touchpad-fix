@@ -105,7 +105,8 @@ patched kernel: a module that changes the speed for this one bus, plus a rebind
 of the controller after boot, is enough. See "How it works" in the
 [README](../README.md).
 
-With the fix on 7.0.0-14 (Secure Boot on, module signed with the MOK key):
+With the fix (version 1.0) on 7.0.0-14 (Secure Boot on, module signed with the
+MOK key):
 
 ```
 i2c_designware AMDI0010:03: [Firmware Bug]: DSDT uses known not-working I2C bus speed 400000, forcing it to 100000
@@ -115,8 +116,9 @@ elan06fa_400khz: AMDI0010:03: bus speed 100 kHz -> 400 kHz
 input: ELAN06FA:00 04F3:3140 Touchpad as /devices/platform/AMDI0010:03/i2c-4/i2c-ELAN06FA:00/...
 ```
 
-In 18 days of normal use: 24 boots, 21 cold (touchpad already working, service
-idle) and 3 warm reboots, all recovered on the first attempt.
+In 18 days of normal use with version 1.0: 24 boots, 21 cold (touchpad already
+working, service idle) and 3 warm reboots, all recovered on the first attempt.
+Version 1.1 keeps the same mechanism; its verification is pending.
 
 ## 7. Open questions
 

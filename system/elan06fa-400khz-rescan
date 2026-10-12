@@ -4,14 +4,36 @@
 CLIENT=/sys/bus/i2c/devices/i2c-ELAN06FA:00
 HID_DRIVER=/sys/bus/i2c/drivers/i2c_hid_acpi
 
-detected() { [ -e "$HID_DRIVER/i2c-ELAN06FA:00" ]; }
+# Bound to a driver (normally i2c_hid_acpi) means the touchpad probed fine.
+detected() { [ -e "$CLIENT/driver" ]; }
+
+# Waits up to $1 half-second steps for the touchpad to get bound.
+wait_detected() {
+    n=0
+    while [ "$n" -lt "$1" ]; do
+        detected && return 0
+        sleep 0.5
+        n=$((n + 1))
+    done
+    detected
+}
 
 if ! modprobe elan06fa_400khz; then
-    echo "Could not load elan06fa_400khz for kernel $(uname -r)."
-    exit 0
+    echo "Could not load elan06fa_400khz for kernel $(uname -r). With Secure Boot," \
+         "check that the DKMS signing key (MOK) is enrolled."
+    exit 1
 fi
 
-if detected; then
+# i2c_hid_acpi probes asynchronously, and on systems without it in the
+# initramfs udev may still be loading it: give the boot-time probe a chance
+# before deciding that it failed.
+if [ -d "$HID_DRIVER" ]; then
+    steps=2
+else
+    modprobe i2c_hid_acpi 2>/dev/null
+    steps=6
+fi
+if wait_detected "$steps"; then
     echo "Touchpad detected at boot; nothing to do."
     exit 0
 fi
@@ -29,8 +51,7 @@ for try in 1 2 3; do
     echo "$ctrl" > "$driver/unbind"
     sleep 0.5
     echo "$ctrl" > "$driver/bind"
-    sleep 2
-    if detected; then
+    if wait_detected 6; then
         echo "Touchpad recovered at 400 kHz (attempt $try)."
         exit 0
     fi

@@ -57,7 +57,7 @@ static struct kretprobe speed_probe = {
 	.entry_handler	= speed_entry,
 	.handler	= speed_return,
 	.data_size	= sizeof(bool),
-	.maxactive	= 4,
+	/* maxactive left at 0: the kernel sizes it for the number of CPUs. */
 };
 
 static const struct dmi_system_id tested_models[] = {

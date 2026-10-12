@@ -11,7 +11,7 @@ command -v i2cget >/dev/null || { echo "Install i2c-tools first: sudo apt instal
 
 CLIENT=/sys/bus/i2c/devices/i2c-ELAN06FA:00
 [[ -e $CLIENT ]] || { echo "No ELAN06FA touchpad found."; exit 1; }
-if [[ -e /sys/bus/i2c/drivers/i2c_hid_acpi/i2c-ELAN06FA:00 ]]; then
+if [[ -e $CLIENT/driver ]]; then
   echo "The touchpad is bound to its driver (working); this test is for when it is not."
   exit 0
 fi

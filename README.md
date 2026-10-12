@@ -48,10 +48,12 @@ is in [docs/DIAGNOSIS.md](docs/DIAGNOSIS.md).
 | Touchpad | ELAN06FA (04F3:3140) on I2C controller AMDI0010:03, address 0x15 |
 | OS | Linux Mint 22.3 (Ubuntu 24.04 base), kernel 7.0 HWE, Secure Boot on |
 
-Real use over 18 days: 24 boots, 3 of them warm reboots; the touchpad was
-recovered on the first attempt every time, with no failures. At 400 kHz the
-touchpad feels normal (no smoothing or lag). The sample of warm reboots is
-still small: reports are welcome.
+Real use over 18 days with version 1.0: 24 boots, 3 of them warm reboots; the
+touchpad was recovered on the first attempt every time, with no failures. At
+400 kHz the touchpad feels normal (no smoothing or lag). Version 1.1 uses the
+same mechanism and only changes how the touchpad's controller is found and how
+failures are reported; its verification on the same laptop is **pending**. The
+sample of warm reboots is still small: reports are welcome.
 
 ## Am I affected?
 
@@ -149,7 +151,9 @@ used when the firmware does not provide them).
 
 ## Upstream status
 
-Not reported yet. If you are affected, a report to the
+Not reported yet. A draft kernel patch that exempts this model from the 100 kHz
+override is in [upstream/](upstream/README.md); once something like it is
+merged, the module is no longer needed. If you are affected, a report to the
 [linux-i2c mailing list](https://lore.kernel.org/linux-i2c/) referencing this
 repository would help.
 

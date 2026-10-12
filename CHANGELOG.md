@@ -5,9 +5,17 @@
 - Find the touchpad's I2C controller through the ELAN06FA ACPI device instead of
   the hard-coded name `AMDI0010:03`, in the module and in the boot service.
 - New module parameter `force=1` to load on untested models (experimental).
-- `install.sh`: checks for DKMS, kernel headers and the Secure Boot (MOK) key,
-  and upgrades from earlier versions.
-- Diagnostic tools: `tools/check.sh` (read-only) and `tools/ack-test.sh`.
+- `install.sh`: checks for DKMS, kernel headers and the Secure Boot (MOK) key
+  (read from the DKMS configuration), builds the new version before removing
+  older ones, keeps the old version if the build fails, and shows the build log
+  on errors.
+- Boot service: waits for the touchpad driver to finish its boot-time probe
+  before deciding it failed, detects the touchpad through any driver, and fails
+  visibly when the module cannot be loaded.
+- Diagnostic tools: `tools/check.sh` (read-only, warns when the module is
+  installed but not loaded) and `tools/ack-test.sh`.
+- `upstream/`: draft kernel patch that exempts this model from the 100 kHz
+  override.
 
 ## 1.0 — 2026-09-24
 

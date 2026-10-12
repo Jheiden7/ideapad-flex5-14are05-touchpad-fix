@@ -1,0 +1,79 @@
+From 0393ee7912179127c1d44db9dc57b026acccc544 Mon Sep 17 00:00:00 2001
+From: Jheiden7 <104173510+Jheiden7@users.noreply.github.com>
+Date: Mon, 12 Oct 2026 10:55:08 -0500
+Subject: [PATCH] i2c: acpi: Keep 400KHz for ELAN06FA on the Lenovo IdeaPad
+ Flex 5 14ARE05
+
+Commit bfd74cd1fbc0 ("i2c: Force ELAN06FA touchpad I2C bus freq to
+100KHz") forces the bus of every ELAN06FA touchpad to 100KHz, to work
+around excessive smoothing seen at 400KHz on some laptops.
+
+On the Lenovo IdeaPad Flex 5 14ARE05 (81X2, AMD Renoir, designware
+controller AMDI0010) the touchpad does not survive a warm reboot at
+100KHz: after a reboot, or a power-off with the charger connected, it
+only acknowledges some of the reads of its address, so i2c_hid_acpi
+fails to probe it (-ENXIO, or -EREMOTEIO when fetching the HID
+descriptor), and it only comes back once all power is removed. At the
+400KHz its DSDT specifies, which Windows uses, the touchpad works across
+warm reboots, switching the bus to 400KHz also recovers a touchpad that
+got stuck at 100KHz, and no excessive smoothing was observed.
+
+Add a DMI table of systems on which the 100KHz override is not applied,
+starting with this laptop.
+
+Fixes: bfd74cd1fbc0 ("i2c: Force ELAN06FA touchpad I2C bus freq to 100KHz")
+Link: https://github.com/Jheiden7/ideapad-flex5-14are05-touchpad-fix
+---
+ drivers/i2c/i2c-core-acpi.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/i2c/i2c-core-acpi.c b/drivers/i2c/i2c-core-acpi.c
+index 8f3bdd5..115436f 100644
+--- a/drivers/i2c/i2c-core-acpi.c
++++ b/drivers/i2c/i2c-core-acpi.c
+@@ -7,6 +7,7 @@
+ 
+ #include <linux/acpi.h>
+ #include <linux/device.h>
++#include <linux/dmi.h>
+ #include <linux/err.h>
+ #include <linux/i2c.h>
+ #include <linux/list.h>
+@@ -378,6 +379,24 @@ static const struct acpi_device_id i2c_acpi_force_100khz_device_ids[] = {
+ 	{}
+ };
+ 
++/*
++ * Systems on which i2c_acpi_force_100khz_device_ids must not be applied.
++ *
++ * Lenovo IdeaPad Flex 5 14ARE05: at 100KHz the ELAN06FA touchpad stops
++ * answering on the bus after a warm reboot (or a power-off with the charger
++ * connected) and only recovers once all power is removed. At the 400KHz its
++ * DSDT specifies it works across reboots, without excessive smoothing.
++ */
++static const struct dmi_system_id i2c_acpi_no_force_100khz_dmi_ids[] = {
++	{
++		.matches = {
++			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
++			DMI_MATCH(DMI_PRODUCT_VERSION, "IdeaPad Flex 5 14ARE05"),
++		},
++	},
++	{}
++};
++
+ static acpi_status i2c_acpi_lookup_speed(acpi_handle handle, u32 level,
+ 					   void *data, void **return_value)
+ {
+@@ -396,7 +415,8 @@ static acpi_status i2c_acpi_lookup_speed(acpi_handle handle, u32 level,
+ 	if (acpi_match_device_ids(adev, i2c_acpi_force_400khz_device_ids) == 0)
+ 		lookup->force_speed = I2C_MAX_FAST_MODE_FREQ;
+ 
+-	if (acpi_match_device_ids(adev, i2c_acpi_force_100khz_device_ids) == 0)
++	if (acpi_match_device_ids(adev, i2c_acpi_force_100khz_device_ids) == 0 &&
++	    !dmi_check_system(i2c_acpi_no_force_100khz_dmi_ids))
+ 		lookup->force_speed = I2C_MAX_STANDARD_MODE_FREQ;
+ 
+ 	return AE_OK;
+-- 
+2.43.0
+

@@ -37,8 +37,8 @@ else
   ok "no 100 kHz quirk message for this bus"
 fi
 
-if [[ -e /sys/bus/i2c/drivers/i2c_hid_acpi/i2c-ELAN06FA:00 ]]; then
-  ok "touchpad is bound to i2c_hid_acpi (working)"
+if [[ -e $client/driver ]]; then
+  ok "touchpad is bound to $(basename "$(readlink -f "$client/driver")") (working)"
 else
   bad "touchpad is NOT bound to a driver (not working in this boot)"
 fi
@@ -47,13 +47,17 @@ prev=$(journalctl -b -1 --no-pager -o cat 2>/dev/null | grep -oE "System is (reb
 [[ -n $prev ]] && info "previous boot ended with: ${prev#System is }"
 
 echo "Fix"
+installed=0
 if modinfo elan06fa_400khz >/dev/null 2>&1; then
+  installed=1
   ok "module elan06fa_400khz is installed for this kernel"
 else
   info "module elan06fa_400khz is not installed for this kernel"
 fi
 if lsmod | grep -q '^elan06fa_400khz'; then
   ok "module is loaded"
+elif (( installed )); then
+  bad "module is installed but NOT loaded (with Secure Boot, is the DKMS signing key enrolled?)"
 fi
 if grep -q "elan06fa_400khz: .*100 kHz -> 400 kHz" <<< "$log"; then
   ok "bus was switched to 400 kHz in this boot"

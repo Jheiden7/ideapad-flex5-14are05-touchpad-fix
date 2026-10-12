@@ -51,10 +51,13 @@ La investigación completa, con las mediciones y todo lo que se descartó, está
 | Touchpad | ELAN06FA (04F3:3140) en el controlador I2C AMDI0010:03, dirección 0x15 |
 | Sistema | Linux Mint 22.3 (base Ubuntu 24.04), kernel 7.0 HWE, Secure Boot activado |
 
-Uso real durante 18 días: 24 arranques, 3 de ellos reinicios en caliente; el
-touchpad se recuperó al primer intento en todos, sin ningún fallo. A 400 kHz el
-touchpad se siente normal (sin suavizado ni retraso). La cantidad de reinicios
-en caliente probados todavía es pequeña: se agradecen los reportes.
+Uso real durante 18 días con la versión 1.0: 24 arranques, 3 de ellos
+reinicios en caliente; el touchpad se recuperó al primer intento en todos, sin
+ningún fallo. A 400 kHz el touchpad se siente normal (sin suavizado ni
+retraso). La versión 1.1 usa el mismo mecanismo y solo cambia cómo localiza el
+controlador del touchpad y cómo informa de los fallos; su verificación en el
+mismo portátil está **pendiente**. La cantidad de reinicios en caliente
+probados todavía es pequeña: se agradecen los reportes.
 
 ## ¿Me afecta?
 
@@ -153,9 +156,11 @@ cuando el firmware no los define).
 
 ## Estado en el kernel oficial
 
-Aún no se ha reportado. Si te afecta, un reporte a la
-[lista de correo linux-i2c](https://lore.kernel.org/linux-i2c/) que haga
-referencia a este repositorio ayudaría.
+Aún no se ha reportado. En [upstream/](upstream/README.md) hay un borrador de
+parche para el kernel que exime a este modelo de la excepción de 100 kHz; cuando
+algo así se incorpore, el módulo dejará de ser necesario. Si te afecta, un
+reporte a la [lista de correo linux-i2c](https://lore.kernel.org/linux-i2c/) que
+haga referencia a este repositorio ayudaría.
 
 ## Licencia
 
