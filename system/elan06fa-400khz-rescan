@@ -50,7 +50,10 @@ if [ ! -d "$driver" ]; then
     exit 1
 fi
 
-if ! { dmesg; journalctl -k -b -o cat; } 2>/dev/null | grep -q "$ctrl: .*forcing it to 100000"; then
+# dmesg is instant; the journal (slow this early in boot) is only a fallback for
+# when the ring buffer has already rotated.
+forced() { grep -q "$ctrl: .*forcing it to 100000"; }
+if ! dmesg 2>/dev/null | forced && ! journalctl -k -b -o cat 2>/dev/null | forced; then
     echo "This kernel did not force $ctrl to 100 kHz; nothing to do."
     exit 0
 fi

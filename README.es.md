@@ -163,10 +163,14 @@ contraseña y reinicia.
    para que el touchpad se detecte de nuevo a 400 kHz:
    - tras un arranque en caliente, esto recupera el touchpad;
    - tras un arranque en frío el touchpad ya funciona, y se pasa a 400 kHz
-     (desaparece durante un segundo, antes de la pantalla de inicio de sesión);
+     (desaparece un momento durante el arranque);
    - si un touchpad que funcionaba a 100 kHz no vuelve a 400 kHz, el servicio
      devuelve el bus a 100 kHz;
    - en un kernel que no fuerza 100 kHz, no hace nada.
+
+   La pantalla de inicio de sesión no espera al servicio: el touchpad se
+   detecta en caliente, así que puede empezar a funcionar unos segundos después
+   de que aparezca la pantalla de inicio de sesión.
 3. DKMS recompila y firma el módulo para cada kernel nuevo, siempre que estén
    instaladas sus cabeceras.
 

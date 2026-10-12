@@ -152,10 +152,13 @@ appears. **Press a key within 10 seconds** (or it is skipped), then pick
    the touchpad probes again at 400 kHz:
    - after a warm boot this recovers the touchpad;
    - after a cold boot the touchpad already works, and is moved to 400 kHz
-     (it disappears for about a second, before the login screen);
+     (it disappears for a moment during boot);
    - if a touchpad that worked at 100 kHz does not come back at 400 kHz, the
      service reverts the bus to 100 kHz;
    - on a kernel that does not force 100 kHz, it does nothing.
+
+   The login screen does not wait for the service: the touchpad is hot-plugged,
+   so it may start working a few seconds after the login screen appears.
 3. DKMS rebuilds and signs the module for every new kernel, as long as its
    headers are installed.
 

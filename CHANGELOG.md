@@ -6,6 +6,9 @@
   cold boot when it already works at 100 kHz, instead of acting only when the
   touchpad is missing. It does nothing on kernels that do not force 100 kHz,
   and reverts to 100 kHz if a working touchpad does not come back at 400 kHz.
+- The login screen no longer waits for the service (the touchpad is
+  hot-plugged), and the kernel log check reads `dmesg` first, using the slower
+  journal only as a fallback.
 - `tools/check.sh`: checks for the tested model, no longer flags the 100 kHz
   message as a problem when the fix switched the bus, and ends with a verdict.
 - Documentation rewritten after an independent review: defines cold and warm

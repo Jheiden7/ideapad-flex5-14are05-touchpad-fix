@@ -1,8 +1,9 @@
 [Unit]
 Description=Run the ELAN06FA touchpad I2C bus at 400 kHz (also recovers the touchpad after a warm reboot)
 ConditionPathExists=/sys/bus/i2c/devices/i2c-ELAN06FA:00
+# Not ordered before the display manager: the touchpad is hot-plugged, so the
+# login screen does not need to wait for this.
 After=systemd-modules-load.service
-Before=display-manager.service
 
 [Service]
 Type=oneshot
