@@ -70,12 +70,13 @@ worked and 3 were warm reboots, each recovered on the first attempt. Versions
 a warm reboot and moved a working one to 400 kHz after a cold boot. The service
 took between 1 and 6 s in the runs measured (registering the kernel probe can
 be slow while the system is still booting), and the final version, tested after
-both a warm reboot and a cold boot, does not delay the login screen. At 400 kHz
-the
-touchpad feels normal (no smoothing or lag). The sample is still small: if you
-try it, please
-[report your result](https://github.com/Jheiden7/ideapad-flex5-14are05-touchpad-fix/issues/new?template=test-report.yml),
-whether it works or not.
+both a warm reboot and a cold boot, does not delay the login screen.
+
+At 400 kHz the touchpad feels normal (no smoothing or lag). The sample is still
+small: if you try it, please [report your result][report], whether it works or
+not.
+
+[report]: https://github.com/Jheiden7/ideapad-flex5-14are05-touchpad-fix/issues/new?template=test-report.yml
 
 ## Am I affected?
 
@@ -217,8 +218,7 @@ in your DSDT's `I2cSerialBusV2` entry for the touchpad first (`acpidump`,
 `iasl`). To try it at your own risk, add `options elan06fa_400khz force=1` to
 `/etc/modprobe.d/elan06fa-400khz.conf`. The scripts expect the touchpad as
 `i2c-ELAN06FA:00`, and `tools/ack-test.sh` uses address 0x15 unless you pass
-`ADDR=0x..`. Please
-[report the result](https://github.com/Jheiden7/ideapad-flex5-14are05-touchpad-fix/issues/new?template=test-report.yml).
+`ADDR=0x..`. Please [report the result][report].
 
 **"loading out-of-tree module taints kernel" in the log?** Expected: the module
 is not part of the official kernel. It is harmless.

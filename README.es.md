@@ -80,11 +80,12 @@ entre 1 y 6 s en las pruebas medidas (registrar la intercepción en el kernel
 puede ser lento mientras el sistema aún arranca), y la versión final, probada
 tanto tras un reinicio en caliente como tras un arranque en frío, no retrasa la
 pantalla de inicio de sesión.
+
 A 400 kHz el touchpad se siente normal (sin suavizado ni retraso). La muestra
-todavía es pequeña: si lo pruebas,
-[cuéntanos el resultado](https://github.com/Jheiden7/ideapad-flex5-14are05-touchpad-fix/issues/new?template=test-report.yml),
-funcione o no (el formulario está en inglés, pero se aceptan reportes en
-español).
+todavía es pequeña: si lo pruebas, [cuéntanos el resultado][reporte], funcione
+o no (el formulario está en inglés, pero se aceptan reportes en español).
+
+[reporte]: https://github.com/Jheiden7/ideapad-flex5-14are05-touchpad-fix/issues/new?template=test-report.yml
 
 ## ¿Me afecta?
 
@@ -232,8 +233,8 @@ cualquier 100 kHz del bus del touchpad, aunque sea el propio firmware quien pida
 tu DSDT (`acpidump`, `iasl`). Para probarlo bajo tu responsabilidad, añade
 `options elan06fa_400khz force=1` en `/etc/modprobe.d/elan06fa-400khz.conf`. Los
 scripts esperan el touchpad como `i2c-ELAN06FA:00`, y `tools/ack-test.sh` usa la
-dirección 0x15 salvo que indiques `ADDR=0x..`.
-[Cuéntanos el resultado](https://github.com/Jheiden7/ideapad-flex5-14are05-touchpad-fix/issues/new?template=test-report.yml).
+dirección 0x15 salvo que indiques `ADDR=0x..`. [Cuéntanos el
+resultado][reporte].
 
 **¿Aparece "loading out-of-tree module taints kernel" en el registro?** Es
 normal: el módulo no forma parte del kernel oficial. Es inofensivo.
