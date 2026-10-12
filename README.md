@@ -64,9 +64,10 @@ used for 18 days: of 24 boots, 21 were cold boots where the touchpad already
 worked and 3 were warm reboots, each recovered on the first attempt. Versions
 1.1 and 1.2 were verified on the same laptop; 1.2 recovered the touchpad after
 a warm reboot and moved a working one to 400 kHz after a cold boot. The service
-took between 1 and 6 s (registering the kernel probe can be slow while the
-system is still booting), and the final version, tested on the cold boot, does
-not delay the login screen. At 400 kHz the
+took between 1 and 6 s in the runs measured (registering the kernel probe can
+be slow while the system is still booting), and the final version, tested after
+both a warm reboot and a cold boot, does not delay the login screen. At 400 kHz
+the
 touchpad feels normal (no smoothing or lag). The sample is still small: reports
 are welcome.
 

@@ -71,9 +71,10 @@ frío y el touchpad ya funcionaba, y 3 fueron reinicios en caliente, todos
 recuperados al primer intento. Las versiones 1.1 y 1.2 se verificaron en el
 mismo portátil; la 1.2 recuperó el touchpad tras un reinicio en caliente y pasó
 a 400 kHz uno que ya funcionaba tras un arranque en frío. El servicio tardó
-entre 1 y 6 s (registrar la intercepción en el kernel puede ser lento mientras
-el sistema aún arranca), y la versión final, probada en el arranque en frío, no
-retrasa la pantalla de inicio de sesión.
+entre 1 y 6 s en las pruebas medidas (registrar la intercepción en el kernel
+puede ser lento mientras el sistema aún arranca), y la versión final, probada
+tanto tras un reinicio en caliente como tras un arranque en frío, no retrasa la
+pantalla de inicio de sesión.
 A 400 kHz el touchpad se siente normal (sin suavizado ni retraso). La muestra
 todavía es pequeña: se agradecen los reportes.
 
