@@ -58,14 +58,17 @@ is in [docs/DIAGNOSIS.md](docs/DIAGNOSIS.md).
 Only tested on the Debian/Ubuntu family (the scripts suggest `apt` commands).
 Other distributions need DKMS and the kernel headers and are untested.
 
-Results so far: 6 warm reboots at 400 kHz, all with a working touchpad (2 with a
-mainline 6.13 kernel that predates the quirk, 4 with the fix). Version 1.0 was
+Results so far: 7 warm reboots at 400 kHz, all with a working touchpad (2 with a
+mainline 6.13 kernel that predates the quirk, 5 with the fix). Version 1.0 was
 used for 18 days: of 24 boots, 21 were cold boots where the touchpad already
-worked and 3 were warm reboots, each recovered on the first attempt. Version 1.1
-was verified with a warm reboot. Version 1.2, which moves the touchpad to
-400 kHz in every boot, is **pending verification**. At 400 kHz the touchpad
-feels normal (no smoothing or lag). The sample is still small: reports are
-welcome.
+worked and 3 were warm reboots, each recovered on the first attempt. Versions
+1.1 and 1.2 were verified on the same laptop; 1.2 recovered the touchpad after
+a warm reboot and moved a working one to 400 kHz after a cold boot. The service
+took between 1 and 6 s (registering the kernel probe can be slow while the
+system is still booting), and the final version, tested on the cold boot, does
+not delay the login screen. At 400 kHz the
+touchpad feels normal (no smoothing or lag). The sample is still small: reports
+are welcome.
 
 ## Am I affected?
 

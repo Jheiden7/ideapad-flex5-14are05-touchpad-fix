@@ -140,7 +140,18 @@ controller):
 
 Since version 1.2 the service also rebinds the controller after a cold boot, so
 the touchpad runs at 400 kHz in every boot, and it reverts to 100 kHz if a
-touchpad that worked does not come back. Its verification is pending.
+touchpad that worked does not come back. Verified after a cold boot (abbreviated
+log):
+
+```
+[    0.81] input: ELAN06FA:00 04F3:3140 Touchpad as /devices/platform/AMDI0010:03/i2c-1/i2c-ELAN06FA:00/...   (100 kHz)
+[    3.59] elan06fa_400khz: active for AMDI0010:03
+[    4.20] elan06fa_400khz: AMDI0010:03: bus speed 100 kHz -> 400 kHz
+[    4.29] input: ELAN06FA:00 04F3:3140 Touchpad as /devices/platform/AMDI0010:03/i2c-1/i2c-ELAN06FA:00/...
+[    4.70] elan06fa-400khz-rescan: Touchpad moved to 400 kHz.
+```
+
+It was also verified after a warm reboot ("Touchpad recovered at 400 kHz.").
 
 ## 7. Open questions
 

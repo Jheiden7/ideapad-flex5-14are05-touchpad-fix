@@ -143,8 +143,18 @@ excepción se imprime cada vez que se inicializa el controlador):
 
 Desde la versión 1.2, el servicio también vuelve a vincular el controlador tras
 un arranque en frío, así que el touchpad funciona a 400 kHz en todos los
-arranques; si un touchpad que funcionaba no vuelve, regresa a 100 kHz. Su
-verificación está pendiente.
+arranques; si un touchpad que funcionaba no vuelve, regresa a 100 kHz. Se
+verificó tras un arranque en frío (registro abreviado):
+
+```
+[    0.81] input: ELAN06FA:00 04F3:3140 Touchpad as /devices/platform/AMDI0010:03/i2c-1/i2c-ELAN06FA:00/...   (100 kHz)
+[    3.59] elan06fa_400khz: active for AMDI0010:03
+[    4.20] elan06fa_400khz: AMDI0010:03: bus speed 100 kHz -> 400 kHz
+[    4.29] input: ELAN06FA:00 04F3:3140 Touchpad as /devices/platform/AMDI0010:03/i2c-1/i2c-ELAN06FA:00/...
+[    4.70] elan06fa-400khz-rescan: Touchpad moved to 400 kHz.
+```
+
+También se verificó tras un reinicio en caliente ("Touchpad recovered at 400 kHz.").
 
 ## 7. Preguntas abiertas
 

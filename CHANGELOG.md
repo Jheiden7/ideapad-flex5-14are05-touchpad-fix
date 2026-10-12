@@ -1,6 +1,11 @@
 # Changelog
 
-## 1.2 — 2026-10-12
+## 1.2 — 2026-10-13
+
+Verified on the IdeaPad Flex 5 14ARE05 (kernel 7.0.0-14-generic, Secure Boot on)
+after a warm reboot (touchpad recovered) and, with the final login-screen
+change, after a cold boot (working touchpad moved to 400 kHz, login screen not
+delayed).
 
 - The boot service moves the touchpad to 400 kHz in every boot, also after a
   cold boot when it already works at 100 kHz, instead of acting only when the

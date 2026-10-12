@@ -64,15 +64,18 @@ Solo está probado en la familia Debian/Ubuntu (los scripts sugieren comandos
 `apt`). Otras distribuciones necesitan DKMS y las cabeceras del kernel, y no
 están probadas.
 
-Resultados hasta ahora: 6 reinicios en caliente a 400 kHz, todos con el touchpad
-funcionando (2 con un kernel mainline 6.13, anterior a la excepción, y 4 con la
+Resultados hasta ahora: 7 reinicios en caliente a 400 kHz, todos con el touchpad
+funcionando (2 con un kernel mainline 6.13, anterior a la excepción, y 5 con la
 solución). La versión 1.0 se usó durante 18 días: de 24 arranques, 21 fueron en
 frío y el touchpad ya funcionaba, y 3 fueron reinicios en caliente, todos
-recuperados al primer intento. La versión 1.1 se verificó con un reinicio en
-caliente. La versión 1.2, que pasa el touchpad a 400 kHz en todos los
-arranques, está **pendiente de verificación**. A 400 kHz el touchpad se siente
-normal (sin suavizado ni retraso). La muestra todavía es pequeña: se agradecen
-los reportes.
+recuperados al primer intento. Las versiones 1.1 y 1.2 se verificaron en el
+mismo portátil; la 1.2 recuperó el touchpad tras un reinicio en caliente y pasó
+a 400 kHz uno que ya funcionaba tras un arranque en frío. El servicio tardó
+entre 1 y 6 s (registrar la intercepción en el kernel puede ser lento mientras
+el sistema aún arranca), y la versión final, probada en el arranque en frío, no
+retrasa la pantalla de inicio de sesión.
+A 400 kHz el touchpad se siente normal (sin suavizado ni retraso). La muestra
+todavía es pequeña: se agradecen los reportes.
 
 ## ¿Me afecta?
 
