@@ -43,7 +43,7 @@ build_failed() {
 dkms_mok_cert() {
   local c
   c=$(grep -hE '^[[:space:]]*mok_certificate=' /etc/dkms/framework.conf \
-        /etc/dkms/framework.conf.d/*.conf 2>/dev/null | tail -n 1 | cut -d= -f2- | tr -d "\"'")
+        /etc/dkms/framework.conf.d/*.conf 2>/dev/null | tail -n 1 | cut -d= -f2- | tr -d "\"'" || true)
   if [[ -z $c ]]; then
     for c in /var/lib/shim-signed/mok/MOK.der /var/lib/dkms/mok.pub; do
       [[ -f $c ]] && break
@@ -54,12 +54,16 @@ dkms_mok_cert() {
 
 check_secure_boot() {
   command -v mokutil >/dev/null || return 0
-  mokutil --sb-state 2>/dev/null | grep -q "SecureBoot enabled" || return 0
-  local cert
+  # mokutil's exit codes are not usable here (--test-key exits 1 for an
+  # enrolled key), so match on its output instead of piping under pipefail.
+  local state cert test
+  state=$(mokutil --sb-state 2>&1 || true)
+  [[ $state == *"SecureBoot enabled"* ]] || return 0
   cert=$(dkms_mok_cert || true)
+  test=$([[ -n $cert ]] && mokutil --test-key "$cert" 2>&1 || true)
   if [[ -z $cert ]]; then
     echo "Secure Boot is enabled: make sure the key DKMS signs modules with is enrolled."
-  elif mokutil --test-key "$cert" 2>/dev/null | grep -q "already enrolled"; then
+  elif [[ $test == *"already enrolled"* ]]; then
     echo "Secure Boot is enabled and the DKMS signing key ($cert) is enrolled."
   else
     cat <<EOF
