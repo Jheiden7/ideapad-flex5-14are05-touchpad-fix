@@ -55,9 +55,10 @@ Uso real durante 18 días con la versión 1.0: 24 arranques, 3 de ellos
 reinicios en caliente; el touchpad se recuperó al primer intento en todos, sin
 ningún fallo. A 400 kHz el touchpad se siente normal (sin suavizado ni
 retraso). La versión 1.1 usa el mismo mecanismo y solo cambia cómo localiza el
-controlador del touchpad y cómo informa de los fallos; su verificación en el
-mismo portátil está **pendiente**. La cantidad de reinicios en caliente
-probados todavía es pequeña: se agradecen los reportes.
+controlador del touchpad y cómo informa de los fallos; se verificó en el mismo
+portátil con Secure Boot activado (reinicio en caliente, touchpad recuperado al
+primer intento unos 2 s después de arrancar el servicio). La cantidad de
+reinicios en caliente probados todavía es pequeña: se agradecen los reportes.
 
 ## ¿Me afecta?
 

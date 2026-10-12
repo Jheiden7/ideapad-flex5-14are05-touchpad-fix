@@ -52,8 +52,10 @@ Real use over 18 days with version 1.0: 24 boots, 3 of them warm reboots; the
 touchpad was recovered on the first attempt every time, with no failures. At
 400 kHz the touchpad feels normal (no smoothing or lag). Version 1.1 uses the
 same mechanism and only changes how the touchpad's controller is found and how
-failures are reported; its verification on the same laptop is **pending**. The
-sample of warm reboots is still small: reports are welcome.
+failures are reported; it was verified on the same laptop with Secure Boot on
+(warm reboot, touchpad recovered on the first attempt about 2 s after the
+service started). The sample of warm reboots is still small: reports are
+welcome.
 
 ## Am I affected?
 

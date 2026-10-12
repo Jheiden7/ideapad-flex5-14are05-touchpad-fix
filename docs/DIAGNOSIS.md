@@ -118,7 +118,15 @@ input: ELAN06FA:00 04F3:3140 Touchpad as /devices/platform/AMDI0010:03/i2c-4/i2c
 
 In 18 days of normal use with version 1.0: 24 boots, 21 cold (touchpad already
 working, service idle) and 3 warm reboots, all recovered on the first attempt.
-Version 1.1 keeps the same mechanism; its verification is pending.
+Version 1.1 keeps the same mechanism and was verified after a warm reboot:
+
+```
+[    0.29] i2c_designware AMDI0010:03: [Firmware Bug]: DSDT uses known not-working I2C bus speed 400000, forcing it to 100000
+[    3.98] elan06fa_400khz: active for AMDI0010:03
+[    5.50] elan06fa_400khz: AMDI0010:03: bus speed 100 kHz -> 400 kHz
+[    5.58] input: ELAN06FA:00 04F3:3140 Touchpad as /devices/platform/AMDI0010:03/i2c-1/i2c-ELAN06FA:00/...
+[    6.01] elan06fa-400khz-rescan: Touchpad recovered at 400 kHz (attempt 1).
+```
 
 ## 7. Open questions
 
