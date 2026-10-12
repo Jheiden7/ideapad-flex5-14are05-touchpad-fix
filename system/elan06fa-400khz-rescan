@@ -22,7 +22,7 @@ wait_detected() {
 
 # Unbinds and rebinds the controller up to 3 times, until the touchpad is back.
 rebind() {
-    for try in 1 2 3; do
+    for _ in 1 2 3; do
         echo "$ctrl" > "$driver/unbind"
         sleep 0.5
         echo "$ctrl" > "$driver/bind"

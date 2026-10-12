@@ -1,6 +1,13 @@
 # Changelog
 
-## 1.2 — 2026-10-13
+## Unreleased
+
+- CI (GitHub Actions): shellcheck on the scripts, and the module built against
+  the Ubuntu 24.04 GA (6.8) and HWE kernel headers.
+- Issue form for test reports from other machines.
+- shellcheck cleanups in the scripts, with no change in behaviour.
+
+## 1.2 — 2026-10-12
 
 Verified on the IdeaPad Flex 5 14ARE05 (kernel 7.0.0-14-generic, Secure Boot on)
 after a warm reboot (touchpad recovered) and a cold boot (working touchpad moved

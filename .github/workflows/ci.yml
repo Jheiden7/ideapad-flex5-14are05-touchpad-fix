@@ -1,0 +1,42 @@
+# Static checks only: the module builds against Ubuntu kernel headers and the
+# scripts pass shellcheck. The fix itself can only be tested on the hardware.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: shellcheck -x install.sh tools/*.sh system/elan06fa-400khz-rescan
+
+  build:
+    name: build (${{ matrix.headers }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        headers:
+          # 6.8 GA kernel, which carries the backported ELAN06FA quirk.
+          - linux-headers-generic
+          # HWE kernel (the 7.0 series the fix was tested on).
+          - linux-headers-generic-hwe-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install kernel headers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ${{ matrix.headers }}
+      - name: Build the module
+        run: |
+          kdir=$(ls -d /usr/src/linux-headers-*-generic | sort -V | tail -n 1)
+          echo "Building against $kdir"
+          make -C module KDIR="$kdir"
+          modinfo module/elan06fa_400khz.ko | grep -E '^(vermagic|parm):'

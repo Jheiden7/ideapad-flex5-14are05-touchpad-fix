@@ -1,0 +1,110 @@
+name: Test report
+description: Tell us whether the fix works on your laptop (positive results help too).
+title: "[Report] <laptop model>: works / does not work"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing! Reports from other machines are the only way to know how far this fix applies. English or Spanish are both fine.
+
+        **Privacy:** do not paste serial numbers, UUIDs, MAC addresses or your username. `tools/check.sh` does not print any of them.
+
+        *Warm boot* = a normal reboot, or a short power-off with the charger connected. *Cold boot* = powering on after the laptop was off with the charger unplugged.
+  - type: input
+    id: model
+    attributes:
+      label: Laptop model
+      description: "`cat /sys/class/dmi/id/product_version /sys/class/dmi/id/product_name`"
+      placeholder: IdeaPad Flex 5 14ARE05 / 81X2
+    validations:
+      required: true
+  - type: input
+    id: bios
+    attributes:
+      label: BIOS version
+      description: "`cat /sys/class/dmi/id/bios_version`"
+      placeholder: EECN44WW
+    validations:
+      required: true
+  - type: input
+    id: kernel
+    attributes:
+      label: Kernel
+      description: "`uname -r`"
+      placeholder: 7.0.0-14-generic
+    validations:
+      required: true
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution
+      placeholder: Linux Mint 22.3
+    validations:
+      required: true
+  - type: dropdown
+    id: before
+    attributes:
+      label: Before installing the fix, after a warm boot
+      options:
+        - The touchpad was missing (affected)
+        - The touchpad worked (not affected)
+        - Did not check
+    validations:
+      required: true
+  - type: dropdown
+    id: warm
+    attributes:
+      label: With the fix, after a warm boot
+      options:
+        - Touchpad works
+        - Touchpad missing
+        - Did not test
+    validations:
+      required: true
+  - type: dropdown
+    id: cold
+    attributes:
+      label: With the fix, after a cold boot
+      options:
+        - Touchpad works
+        - Touchpad missing
+        - Did not test
+    validations:
+      required: true
+  - type: dropdown
+    id: feel
+    attributes:
+      label: How does the touchpad feel at 400 kHz?
+      options:
+        - Normal
+        - Laggy or overly smoothed
+        - Other (explain below)
+    validations:
+      required: true
+  - type: checkboxes
+    id: force
+    attributes:
+      label: Module options
+      options:
+        - label: My model is not the tested one and I loaded the module with `force=1`
+  - type: dropdown
+    id: secureboot
+    attributes:
+      label: Secure Boot
+      options:
+        - Enabled (MOK key enrolled)
+        - Disabled
+        - Not sure
+  - type: textarea
+    id: check
+    attributes:
+      label: Output of tools/check.sh after a warm boot, with the fix installed
+      description: Run `./tools/check.sh` right after a normal reboot and paste the whole output.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Errors from `sudo ./install.sh`, `journalctl -b -u elan06fa-400khz`, other observations.

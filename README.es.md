@@ -2,6 +2,11 @@
 
 [English](README.md) | **Español**
 
+[![CI](https://github.com/Jheiden7/ideapad-flex5-14are05-touchpad-fix/actions/workflows/ci.yml/badge.svg)](https://github.com/Jheiden7/ideapad-flex5-14are05-touchpad-fix/actions/workflows/ci.yml)
+<sub>La integración continua solo comprueba que el módulo compila contra las
+cabeceras de los kernels de Ubuntu y que los scripts pasan shellcheck; la
+solución en sí se prueba en el portátil.</sub>
+
 En los kernels recientes de Linux, el touchpad ELAN06FA del **Lenovo IdeaPad
 Flex 5 14ARE05** deja de funcionar tras un reinicio normal, y solo vuelve cuando
 el portátil pasa un tiempo sin energía.
@@ -76,7 +81,10 @@ puede ser lento mientras el sistema aún arranca), y la versión final, probada
 tanto tras un reinicio en caliente como tras un arranque en frío, no retrasa la
 pantalla de inicio de sesión.
 A 400 kHz el touchpad se siente normal (sin suavizado ni retraso). La muestra
-todavía es pequeña: se agradecen los reportes.
+todavía es pequeña: si lo pruebas,
+[cuéntanos el resultado](https://github.com/Jheiden7/ideapad-flex5-14are05-touchpad-fix/issues/new?template=test-report.yml),
+funcione o no (el formulario está en inglés, pero se aceptan reportes en
+español).
 
 ## ¿Me afecta?
 
@@ -224,7 +232,8 @@ cualquier 100 kHz del bus del touchpad, aunque sea el propio firmware quien pida
 tu DSDT (`acpidump`, `iasl`). Para probarlo bajo tu responsabilidad, añade
 `options elan06fa_400khz force=1` en `/etc/modprobe.d/elan06fa-400khz.conf`. Los
 scripts esperan el touchpad como `i2c-ELAN06FA:00`, y `tools/ack-test.sh` usa la
-dirección 0x15 salvo que indiques `ADDR=0x..`. Abre un issue con el resultado.
+dirección 0x15 salvo que indiques `ADDR=0x..`.
+[Cuéntanos el resultado](https://github.com/Jheiden7/ideapad-flex5-14are05-touchpad-fix/issues/new?template=test-report.yml).
 
 **¿Aparece "loading out-of-tree module taints kernel" en el registro?** Es
 normal: el módulo no forma parte del kernel oficial. Es inofensivo.

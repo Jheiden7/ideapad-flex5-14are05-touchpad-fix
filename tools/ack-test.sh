@@ -28,7 +28,7 @@ modprobe i2c-dev
 echo "I2C bus $bus, address $addr:"
 echo -n "  "
 hits=0
-for i in $(seq 20); do
+for _ in $(seq 20); do
   if i2cget -y "$bus" "$addr" >/dev/null 2>&1; then echo -n S; hits=$((hits + 1)); else echo -n .; fi
   sleep 0.25
 done

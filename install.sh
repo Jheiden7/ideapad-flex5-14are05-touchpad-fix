@@ -60,7 +60,10 @@ check_secure_boot() {
   state=$(mokutil --sb-state 2>&1 || true)
   [[ $state == *"SecureBoot enabled"* ]] || return 0
   cert=$(dkms_mok_cert || true)
-  test=$([[ -n $cert ]] && mokutil --test-key "$cert" 2>&1 || true)
+  test=""
+  if [[ -n $cert ]]; then
+    test=$(mokutil --test-key "$cert" 2>&1 || true)
+  fi
   if [[ -z $cert ]]; then
     echo "Secure Boot is enabled: make sure the key DKMS signs modules with is enrolled."
   elif [[ $test == *"already enrolled"* ]]; then
