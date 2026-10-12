@@ -8,19 +8,26 @@ Linux Mint 22.3 with kernel 7.0.0-14-generic, Secure Boot enabled.
 
 ## 1. The symptom pattern
 
-The touchpad had worked on Windows across reboots. On Linux it worked only after
-powering on with the charger unplugged. Cross-checking two weeks of boot logs
-(how the previous boot ended, charger state at boot, whether the touchpad input
-device appeared) confirmed it:
+The touchpad had worked on Windows across reboots. On Linux it worked after a
+cold boot and failed after a warm one (see the terms in the
+[README](../README.md)). Cross-checking two weeks of boot logs gave this
+pattern. The logs record how the previous boot ended, whether the charger was
+connected when the laptop booted (not while it was off) and whether the
+touchpad input device appeared:
 
-| Previous shutdown | Charger at boot | Touchpad |
+| Previous shutdown | Charger at the next boot | Touchpad |
 |---|---|---|
-| Reboot | connected | broken, every time |
+| Reboot | connected (every reboot observed) | broken, every time |
 | Short power-off (1–2 min) | connected | broken, almost every time |
-| Long power-off (overnight) or power-off without charger | any | working, almost every time |
+| Long power-off (overnight) | connected or not | working, almost every time |
+| Power-off with the charger unplugged | not connected | working, almost every time |
 
-While the charger is connected the touchpad keeps power during a reboot or a
-power-off, so it never really resets. Only removing all power brings it back.
+Presumably the touchpad's supply stays on during a reboot, and during a
+power-off while the charger is connected, so the touchpad is never really reset.
+Being off without the charger resets it. Why a long power-off also helps when
+the charger is connected at boot is not known: the charger may have been
+unplugged during the night, or the embedded controller may cut standby power
+after a while.
 
 ## 2. What happens at boot
 
@@ -118,15 +125,22 @@ input: ELAN06FA:00 04F3:3140 Touchpad as /devices/platform/AMDI0010:03/i2c-4/i2c
 
 In 18 days of normal use with version 1.0: 24 boots, 21 cold (touchpad already
 working, service idle) and 3 warm reboots, all recovered on the first attempt.
-Version 1.1 keeps the same mechanism and was verified after a warm reboot:
+Version 1.1 keeps the same mechanism and was verified after a warm reboot
+(abbreviated log; the quirk message is printed on every probe of the
+controller):
 
 ```
 [    0.29] i2c_designware AMDI0010:03: [Firmware Bug]: DSDT uses known not-working I2C bus speed 400000, forcing it to 100000
 [    3.98] elan06fa_400khz: active for AMDI0010:03
+[    5.50] i2c_designware AMDI0010:03: [Firmware Bug]: DSDT uses known not-working I2C bus speed 400000, forcing it to 100000
 [    5.50] elan06fa_400khz: AMDI0010:03: bus speed 100 kHz -> 400 kHz
 [    5.58] input: ELAN06FA:00 04F3:3140 Touchpad as /devices/platform/AMDI0010:03/i2c-1/i2c-ELAN06FA:00/...
 [    6.01] elan06fa-400khz-rescan: Touchpad recovered at 400 kHz (attempt 1).
 ```
+
+Since version 1.2 the service also rebinds the controller after a cold boot, so
+the touchpad runs at 400 kHz in every boot, and it reverts to 100 kHz if a
+touchpad that worked does not come back. Its verification is pending.
 
 ## 7. Open questions
 

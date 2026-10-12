@@ -8,20 +8,26 @@ Linux Mint 22.3 con kernel 7.0.0-14-generic y Secure Boot activado.
 
 ## 1. El patrón del síntoma
 
-En Windows el touchpad funcionaba tras cualquier reinicio. En Linux solo
-funcionaba al encender con el cargador desconectado. Lo confirmó el cruce de dos
-semanas de registros de arranque (cómo terminó el arranque anterior, si el
-cargador estaba conectado y si apareció el dispositivo del touchpad):
+En Windows el touchpad funcionaba tras cualquier reinicio. En Linux funcionaba
+tras un arranque en frío y fallaba tras uno en caliente (ver los términos en el
+[README](../README.es.md)). El cruce de dos semanas de registros de arranque dio
+este patrón. Los registros guardan cómo terminó el arranque anterior, si el
+cargador estaba conectado al arrancar (no mientras el equipo estaba apagado) y
+si apareció el dispositivo del touchpad:
 
-| Apagado anterior | Cargador al arrancar | Touchpad |
+| Apagado anterior | Cargador en el arranque siguiente | Touchpad |
 |---|---|---|
-| Reinicio | conectado | falla, siempre |
+| Reinicio | conectado (en todos los reinicios observados) | falla, siempre |
 | Apagado corto (1–2 min) | conectado | falla, casi siempre |
-| Apagado largo (de noche) o apagado sin cargador | cualquiera | funciona, casi siempre |
+| Apagado largo (de noche) | conectado o no | funciona, casi siempre |
+| Apagado con el cargador desconectado | no conectado | funciona, casi siempre |
 
-Con el cargador conectado, el touchpad conserva la alimentación durante un
-reinicio o un apagado, así que nunca llega a reiniciarse del todo. Solo quitarle
-toda la energía lo recupera.
+Es de suponer que la alimentación del touchpad se mantiene durante un reinicio,
+y durante un apagado con el cargador conectado, así que el touchpad nunca llega
+a reiniciarse de verdad. Estar apagado sin cargador sí lo reinicia. No se sabe
+por qué un apagado largo también lo arregla cuando el cargador está conectado al
+arrancar: puede que el cargador estuviera desconectado durante la noche, o que
+el controlador embebido corte la alimentación de reposo pasado un tiempo.
 
 ## 2. Qué pasa al arrancar
 
@@ -123,15 +129,22 @@ input: ELAN06FA:00 04F3:3140 Touchpad as /devices/platform/AMDI0010:03/i2c-4/i2c
 En 18 días de uso normal con la versión 1.0: 24 arranques, 21 en frío (el
 touchpad ya funcionaba y el servicio no hizo nada) y 3 reinicios en caliente,
 todos recuperados al primer intento. La versión 1.1 mantiene el mismo mecanismo y
-se verificó tras un reinicio en caliente:
+se verificó tras un reinicio en caliente (registro abreviado; el mensaje de la
+excepción se imprime cada vez que se inicializa el controlador):
 
 ```
 [    0.29] i2c_designware AMDI0010:03: [Firmware Bug]: DSDT uses known not-working I2C bus speed 400000, forcing it to 100000
 [    3.98] elan06fa_400khz: active for AMDI0010:03
+[    5.50] i2c_designware AMDI0010:03: [Firmware Bug]: DSDT uses known not-working I2C bus speed 400000, forcing it to 100000
 [    5.50] elan06fa_400khz: AMDI0010:03: bus speed 100 kHz -> 400 kHz
 [    5.58] input: ELAN06FA:00 04F3:3140 Touchpad as /devices/platform/AMDI0010:03/i2c-1/i2c-ELAN06FA:00/...
 [    6.01] elan06fa-400khz-rescan: Touchpad recovered at 400 kHz (attempt 1).
 ```
+
+Desde la versión 1.2, el servicio también vuelve a vincular el controlador tras
+un arranque en frío, así que el touchpad funciona a 400 kHz en todos los
+arranques; si un touchpad que funcionaba no vuelve, regresa a 100 kHz. Su
+verificación está pendiente.
 
 ## 7. Preguntas abiertas
 

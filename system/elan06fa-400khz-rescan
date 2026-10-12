@@ -1,6 +1,8 @@
 #!/bin/sh
-# Load elan06fa_400khz and, if the touchpad was not detected at boot (at
-# 100 kHz), rebind its I2C controller so the touchpad probes again at 400 kHz.
+# Load elan06fa_400khz and, when the kernel forced the touchpad's I2C bus to
+# 100 kHz at boot, rebind the controller so the touchpad runs at 400 kHz in
+# every boot. This recovers a touchpad that did not probe after a warm reboot,
+# and also moves a working one (after a cold boot) to 400 kHz.
 CLIENT=/sys/bus/i2c/devices/i2c-ELAN06FA:00
 HID_DRIVER=/sys/bus/i2c/drivers/i2c_hid_acpi
 
@@ -18,43 +20,68 @@ wait_detected() {
     detected
 }
 
+# Unbinds and rebinds the controller up to 3 times, until the touchpad is back.
+rebind() {
+    for try in 1 2 3; do
+        echo "$ctrl" > "$driver/unbind"
+        sleep 0.5
+        echo "$ctrl" > "$driver/bind"
+        wait_detected 6 && return 0
+    done
+    return 1
+}
+
 if ! modprobe elan06fa_400khz; then
     echo "Could not load elan06fa_400khz for kernel $(uname -r). With Secure Boot," \
          "check that the DKMS signing key (MOK) is enrolled."
     exit 1
 fi
 
+if [ ! -e "$CLIENT" ]; then
+    echo "Touchpad I2C client not found."
+    exit 1
+fi
+# .../<controller>/i2c-N/i2c-ELAN06FA:00 -> <controller>
+ctrl_path=$(dirname "$(dirname "$(readlink -f "$CLIENT")")")
+ctrl=$(basename "$ctrl_path")
+driver=$(readlink -f "$ctrl_path/driver")
+if [ ! -d "$driver" ]; then
+    echo "Touchpad I2C controller not found."
+    exit 1
+fi
+
+if ! { dmesg; journalctl -k -b -o cat; } 2>/dev/null | grep -q "$ctrl: .*forcing it to 100000"; then
+    echo "This kernel did not force $ctrl to 100 kHz; nothing to do."
+    exit 0
+fi
+
 # i2c_hid_acpi probes asynchronously, and on systems without it in the
-# initramfs udev may still be loading it: give the boot-time probe a chance
-# before deciding that it failed.
+# initramfs udev may still be loading it: let the boot-time probe finish
+# before looking at the touchpad.
 if [ -d "$HID_DRIVER" ]; then
     steps=2
 else
     modprobe i2c_hid_acpi 2>/dev/null
     steps=6
 fi
-if wait_detected "$steps"; then
-    echo "Touchpad detected at boot; nothing to do."
+was_working=0
+wait_detected "$steps" && was_working=1
+
+if rebind; then
+    if [ "$was_working" = 1 ]; then
+        echo "Touchpad moved to 400 kHz."
+    else
+        echo "Touchpad recovered at 400 kHz."
+    fi
     exit 0
 fi
 
-# .../<controller>/i2c-N/i2c-ELAN06FA:00 -> <controller>
-ctrl_path=$(dirname "$(dirname "$(readlink -f "$CLIENT")")")
-ctrl=$(basename "$ctrl_path")
-driver=$(readlink -f "$ctrl_path/driver")
-if [ ! -e "$CLIENT" ] || [ ! -d "$driver" ]; then
-    echo "Touchpad I2C controller not found."
-    exit 1
+if [ "$was_working" = 1 ]; then
+    # It worked at 100 kHz but not at 400 kHz: go back to 100 kHz.
+    modprobe -r elan06fa_400khz
+    rebind
+    echo "Touchpad did not come back at 400 kHz; reverted $ctrl to 100 kHz."
+else
+    echo "Could not recover the touchpad."
 fi
-
-for try in 1 2 3; do
-    echo "$ctrl" > "$driver/unbind"
-    sleep 0.5
-    echo "$ctrl" > "$driver/bind"
-    if wait_detected 6; then
-        echo "Touchpad recovered at 400 kHz (attempt $try)."
-        exit 0
-    fi
-done
-echo "Could not recover the touchpad."
 exit 1

@@ -1,5 +1,5 @@
 [Unit]
-Description=Run the ELAN06FA touchpad I2C bus at 400 kHz (recovers the touchpad after a warm reboot)
+Description=Run the ELAN06FA touchpad I2C bus at 400 kHz (also recovers the touchpad after a warm reboot)
 ConditionPathExists=/sys/bus/i2c/devices/i2c-ELAN06FA:00
 After=systemd-modules-load.service
 Before=display-manager.service

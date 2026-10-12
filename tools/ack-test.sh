@@ -3,8 +3,11 @@
 # answers and . when it does not. A healthy touchpad answers every time; after a
 # warm reboot at 100 kHz an affected one answers only some of the time or never.
 #
-# Only works while no driver is bound to the touchpad (i.e. when it is broken).
+# Only works while no driver is bound to the touchpad, i.e. after a warm reboot
+# without the fix active (before installing it, or with the service disabled).
 # Needs root and i2c-tools:  sudo apt install i2c-tools && sudo ./tools/ack-test.sh
+# The address defaults to 0x15 (this model's DSDT); override it with, e.g.,
+#   sudo ADDR=0x2c ./tools/ack-test.sh
 set -u
 [[ $EUID -eq 0 ]] || { echo "Run as root: sudo $0"; exit 1; }
 command -v i2cget >/dev/null || { echo "Install i2c-tools first: sudo apt install i2c-tools"; exit 1; }

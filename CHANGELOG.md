@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.2 — 2026-10-12
+
+- The boot service moves the touchpad to 400 kHz in every boot, also after a
+  cold boot when it already works at 100 kHz, instead of acting only when the
+  touchpad is missing. It does nothing on kernels that do not force 100 kHz,
+  and reverts to 100 kHz if a working touchpad does not come back at 400 kHz.
+- `tools/check.sh`: checks for the tested model, no longer flags the 100 kHz
+  message as a problem when the fix switched the bus, and ends with a verdict.
+- Documentation rewritten after an independent review: defines cold and warm
+  boots, aligns the charger pattern with the diagnosis, explains that the
+  service loads the module in every boot, how to read `check.sh`, the `force=1`
+  caveat, updating and uninstalling, and tones down claims to what was measured.
+
 ## 1.1 — 2026-10-12
 
 Verified on the IdeaPad Flex 5 14ARE05 (BIOS EECN44WW, kernel 7.0.0-14-generic,
